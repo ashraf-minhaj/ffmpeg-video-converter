@@ -1,5 +1,5 @@
-input_path=../media_res/video2.mp4
-output_path=../converted/video1.mp4
+input_path=../media_res/video1.mp4
+output_path=../converted/
 
 # res array
 declare -a ResList=("3840:2160" "1280:720" "640:480")
@@ -25,7 +25,7 @@ input_height=$(ffprobe -v error -select_streams v:0 -show_entries \
             )
 
 input_res="$input_width:$input_height"
-echo $input_res
+echo "$input_path res= $input_res"
 
 # iterate
 for indx in ${!ResList[@]};
@@ -42,17 +42,28 @@ do
     fi 
 done
 
-echo $indx
-echo ${#ResList[@]}
+echo "Matched at index $indx"
 
-# echo $(($indx+1))
+# arr_len=${#ResList[@]}
+# echo $arr_len
 
-# echo $((${#ResList[@]}+1))
-
-while [ (($indx)) == ((${#ResList[@]})) ]
+# delete larger resolution values from array
+val=0
+while [[ $val -lt $indx || $val -eq $indx ]];
 do
-    echo less
+    # echo "val is $val"
+    unset ResList[$val]
+    let val++
 done
 
-# output
-# ffmpeg -i $input_path -vf scale=$w:$h <encoding-parameters> $output_path
+
+# now create output files for every other res
+echo "need to convert for res: ${ResList[@]}"
+
+for res in ${ResList[@]};
+do
+    echo "Converting $res"
+    ffmpeg -y -i $input_path -vf scale=$res -preset slow -crf 18 $output_path/$res.mp4
+done
+
+echo "complete."
