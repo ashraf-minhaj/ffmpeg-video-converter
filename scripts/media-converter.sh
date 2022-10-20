@@ -1,5 +1,13 @@
-input_path=../media_res/video1.mp4
+#! /bin/bash
+exec >> logs 2>&1
+# set -x
+
+input_path=../media_res/video2.mp4
 output_path=../converted/
+
+# to log with date
+dt=$(date)
+printf "** New Execution $dt ___________________________________________________________\n"
 
 # res array
 declare -a ResList=("3840:2160" "1280:720" "640:480")
@@ -66,4 +74,4 @@ do
     ffmpeg -y -i $input_path -vf scale=$res -preset slow -crf 18 $output_path/$res.mp4
 done
 
-echo "complete."
+printf "** Execution complete for $dt ____________________________________________\n\n"
