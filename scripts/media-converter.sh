@@ -1,5 +1,5 @@
 # ! /bin/bash
-exec >> logs 2>&1
+exec >> log_converter 2>&1
 # set -x  # show commands before running
 set -e   # exit on first error
 started=`date +%s`

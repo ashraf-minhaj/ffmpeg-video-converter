@@ -4,3 +4,5 @@ scripts/logs
 converted/*
 *.pem
 secret.txt
+scripts/log_converter
+scripts/log_transporter

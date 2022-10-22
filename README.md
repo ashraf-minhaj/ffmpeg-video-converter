@@ -104,6 +104,11 @@ Trusted entities will look like this -
 aws s3 (cp/mv) file.txt s3://bucket/ --region us-east-1
 ```
 
+11. Automate s3 move.
+This creates a timestamp and moves the files into that path of s3.
+run `bash media-transporter.sh s3_bucket_name`
+
 #### to do
-11. Automate s3 move
-12. s3 - sns
+12. Job Queue
+13. s3 - sns
+14. archive src
