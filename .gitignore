@@ -2,3 +2,5 @@
 media_res/video1.mp4
 scripts/logs
 converted/*
+*.pem
+secret.txt

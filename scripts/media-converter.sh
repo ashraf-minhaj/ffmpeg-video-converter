@@ -1,6 +1,7 @@
 # ! /bin/bash
 exec >> logs 2>&1
 # set -x  # show commands before running
+set -e   # exit on first error
 started=`date +%s`
 
 input_path=../media_res/video2.mp4
@@ -8,7 +9,7 @@ output_path=../converted/
 
 # to log with date
 dt=$(date)
-printf "** New Execution $dt ___________________________________________________________\n"
+printf "\n** New Execution $dt ___________________________________________________________\n"
 
 # array of possible standard heights; order: top2bottom
 declare -a HeightList=("2160" "1080" "720" "480" "360" "240" "144")
@@ -42,18 +43,19 @@ echo "Matched at index $indx"
 # arr_len=${#HeightList[@]}
 # echo $arr_len
 
-# delete larger resolution values from array
+printf "delete larger resolution values from array\n"
 val=0
 while [[ $val -lt $indx ]];
 do
-    # echo "val is $val"
+    echo "val is $val"
     unset HeightList[$val]
-    let val++
+    # let val++              # error here
+    val=$(expr $val + 1)
 done
 
 
-# now create output files for every other height
-echo "Need to convert for height: ${HeightList[@]}"
+printf "create output files for every other height\n"
+echo "Need to convert for height(s): ${HeightList[@]}"
 
 for height in ${HeightList[@]};
 do

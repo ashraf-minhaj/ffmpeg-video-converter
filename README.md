@@ -28,8 +28,22 @@ wget https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4 
 mv -u sample2.mp4 video2.mp4
 ```
 
-#### to do
 8. connect from local machine via ssh
+8.1 download ssh key pair
+8.1 run this to ensure the key is not publicly viewable
+```
+chmod 400 mediaconverterkey.pem
+```
+8.2 connect -
+```
+ssh -i "key.pem" ubuntu@ip.region.compute.amazonaws.com
+```
+
 9. download file on local machine for testing 
+```
+scp -i "key.pem" ubuntu@ip.region.compute.amazonaws.com:mediaConverter/converted/h264_main_144p_3000.mp4 down.mp4
+```
+
+#### to do
 10. upload files to s3 automatically after job completion
 11. s3 - sns
