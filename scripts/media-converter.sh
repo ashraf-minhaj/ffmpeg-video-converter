@@ -1,6 +1,7 @@
-#! /bin/bash
+# ! /bin/bash
 exec >> logs 2>&1
-# set -x
+# set -x  # show commands before running
+started=`date +%s`
 
 input_path=../media_res/video2.mp4
 output_path=../converted/
@@ -9,69 +10,64 @@ output_path=../converted/
 dt=$(date)
 printf "** New Execution $dt ___________________________________________________________\n"
 
-# res array
-declare -a ResList=("3840:2160" "1280:720" "640:480")
-# declare -a HeightList=("2160" "720" "360")
+# array of possible standard heights; order: top2bottom
+declare -a HeightList=("2160" "1080" "720" "480" "360" "240" "144")
 
 
-# get input file resolution
-# ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 $file_path
-# input_res=$(ffprobe -v error -select_streams v:0 -show_entries \
-#             stream=width,height -of csv=s=x:p=0 \
-#             $input_path \
-#         )
-
-# get height and width seperately for using ';' delimeter
-input_width=$(ffprobe -v error -select_streams v:0 -show_entries \
-            stream=width -of csv=s=x:p=0 \
-            $input_path \
-        )
-
+# get height of input video file
 input_height=$(ffprobe -v error -select_streams v:0 -show_entries \
-            stream=height -of csv=s=x:p=0 \
+            stream=height -of csv=p=0 \
             $input_path \
             )
 
-input_res="$input_width:$input_height"
-echo "$input_path res= $input_res"
+echo "Input= $input_path, height= $input_height"
 
-# iterate
-for indx in ${!ResList[@]};
+# iterate and match
+for indx in ${!HeightList[@]};
 do  
-    res=${ResList[indx]}
-    # echo $indx $res
+    height=${HeightList[indx]}
+    # echo $indx $height
 
-    if [ $res == $input_res ];
+    if [ $height == $input_height ];
         then
-            echo "Input $input_res matches with res $res"
+            echo "Input $input_height matches with height $height"
             break
-        else
-            echo "Input $input_res does not with res $res"
+        # else
+        #     echo "Input $input_height does not with height $height"
     fi 
 done
 
 echo "Matched at index $indx"
 
-# arr_len=${#ResList[@]}
+# arr_len=${#HeightList[@]}
 # echo $arr_len
 
 # delete larger resolution values from array
 val=0
-while [[ $val -lt $indx || $val -eq $indx ]];
+while [[ $val -lt $indx ]];
 do
     # echo "val is $val"
-    unset ResList[$val]
+    unset HeightList[$val]
     let val++
 done
 
 
-# now create output files for every other res
-echo "need to convert for res: ${ResList[@]}"
+# now create output files for every other height
+echo "Need to convert for height: ${HeightList[@]}"
 
-for res in ${ResList[@]};
+for height in ${HeightList[@]};
 do
-    echo "Converting $res"
-    ffmpeg -y -i $input_path -vf scale=$res -preset slow -crf 18 $output_path/$res.mp4
+    printf "\n* Converting for "$height"p \n"
+    ffmpeg -i $input_path -c:a copy \
+    -vf scale=-2:$height \
+    -c:v libx264 -profile:v main -level:v 4.0 \
+    -x264-params scenecut=0:open_gop=0:min-keyint=72:keyint=72 \
+    -minrate 3000k -maxrate 3000k -bufsize 3000k -b:v 3000k \
+    -y $output_path/h264_main_"$height"p_3000.mp4
+    # ffmpeg -y -i $input_path -vf scale=-2:$height $output_path/$height.mp4 #basic
 done
 
-printf "** Execution complete for $dt ____________________________________________\n\n"
+end=`date +%s`
+duration=$(($end - $started))
+printf "\nprocess took $duration seconds."
+printf "\n** Execution complete for $dt ____________________________________________\n\n"
