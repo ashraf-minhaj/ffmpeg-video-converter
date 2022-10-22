@@ -29,12 +29,15 @@ mv -u sample2.mp4 video2.mp4
 ```
 
 8. connect from local machine via ssh
-8.1 download ssh key pair
-8.1 run this to ensure the key is not publicly viewable
+
+8.1. download ssh key pair
+
+8.2. run this to ensure the key is not publicly viewable
 ```
 chmod 400 mediaconverterkey.pem
 ```
-8.2 connect -
+
+8.3. connect -
 ```
 ssh -i "key.pem" ubuntu@ip.region.compute.amazonaws.com
 ```
@@ -44,6 +47,63 @@ ssh -i "key.pem" ubuntu@ip.region.compute.amazonaws.com
 scp -i "key.pem" ubuntu@ip.region.compute.amazonaws.com:mediaConverter/converted/h264_main_144p_3000.mp4 down.mp4
 ```
 
-#### to do
 10. upload files to s3 automatically after job completion
-11. s3 - sns
+
+10.1. Check if aws cli is installed
+```
+aws --version
+```
+
+`10.2. install aws cli if not found on 10.1 [aws doc](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+```
+sudo apt-get install unzip
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+10.3. Grant access using IAM role (recommended way)
+Create and attach policy to a role -> ec2 service
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::bucket/*"
+        }
+    ]
+}
+```
+
+Trusted entities will look like this -
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            }
+        }
+    ]
+}
+```
+
+10.4. Send files to s3 (cp to copy, mv to move)
+```
+aws s3 (cp/mv) file.txt s3://bucket/ --region us-east-1
+```
+
+#### to do
+11. Automate s3 move
+12. s3 - sns
