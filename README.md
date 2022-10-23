@@ -109,6 +109,6 @@ This creates a timestamp and moves the files into that path of s3.
 run `bash media-transporter.sh s3_bucket_name`
 
 #### to do
-12. Job Queue
+12. Job Queue [doc](https://hevodata.com/learn/python-sqs/#:~:text=To%20receive%20a%20message%20from,from%20your%20specified%20SQS%20Queue.&text=Parameters%3A,wish%20to%20send%20a%20message.)
 13. s3 - sns
 14. archive src
